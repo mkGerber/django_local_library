@@ -1,4 +1,7 @@
 from django.db import models
+from django.conf import settings
+
+from datetime import date
 
 from django.urls import reverse # Used in get_absolute_url() to get URL for specified ID
 
@@ -86,6 +89,13 @@ class BookInstance(models.Model):
 
     class Meta:
         ordering = ['due_back']
+
+    borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+
+    @property
+    def is_overdue(self):
+        """Determines if the book is overdue based on due date and current date."""
+        return bool(self.due_back and date.today() > self.due_back)
 
     def __str__(self):
         """String for representing the Model object."""
